@@ -1,0 +1,104 @@
+
+#include <Wire.h>
+#include <Math.h>
+
+// MPU-6050 #1 Registers
+const int MPU_ADDR_1 = 0x68;
+const int PWR_MGMT_1_1 = 0x6B;
+const int ACCEL_XOUT_H_1 = 0x3B;
+const int GYRO_XOUT_H_1 = 0x43;
+
+int16_t accX_1, accY_1, accZ_1;
+int16_t gyroX_1, gyroY_1, gyroZ_1;
+float roll_1, pitch_1, yaw_1;
+int16_t y,x,y1,x1,y2,y3;
+
+// MPU-6050 #2 Registers
+const int MPU_ADDR_2 = 0x69;  // Alternative I2C address
+const int PWR_MGMT_1_2 = 0x6B;
+const int ACCEL_XOUT_H_2 = 0x3B;
+const int GYRO_XOUT_H_2 = 0x43;
+
+int16_t accX_2, accY_2, accZ_2;
+int16_t gyroX_2, gyroY_2, gyroZ_2;
+float roll_2, pitch_2, yaw_2;
+
+void setup() {
+  Serial.begin(9600);
+
+  Wire.begin();
+
+  // Wake up MPU-6050 #1
+  Wire.beginTransmission(MPU_ADDR_1);
+  Wire.write(PWR_MGMT_1_1);
+  Wire.write(0);
+  Wire.endTransmission(true);
+
+  // Wake up MPU-6050 #2
+  Wire.beginTransmission(MPU_ADDR_2);
+  Wire.write(PWR_MGMT_1_2);
+  Wire.write(0);
+  Wire.endTransmission(true);
+
+  delay(100);
+}
+
+void loop() {
+  // Read data from MPU-6050 #1
+  readMPU6050Data(MPU_ADDR_1, &accX_1, &accY_1, &accZ_1, &gyroX_1, &gyroY_1, &gyroZ_1);
+
+  // Read data from MPU-6050 #2
+  readMPU6050Data(MPU_ADDR_2, &accX_2, &accY_2, &accZ_2, &gyroX_2, &gyroY_2, &gyroZ_2);
+
+  // Calculate roll, pitch, and yaw angles for MPU-6050 #1
+  roll_1 = atan2(accY_1, accZ_1) * 180.0 / PI;
+  pitch_1 = atan2(-accX_1 , sqrt(abs(accY_1 * accY_1 + accZ_1 * accZ_1))) * 180.0 / PI;
+  yaw_1 = atan2(gyroY_1, gyroZ_1) * 180.0 / PI;
+  x=abs(accY_1 * accY_1 + accZ_1 * accZ_1);
+  y=constrain(x,1,100000);
+  y1=atan2(-accX_1,sqrt(y))*180.0/PI;  
+   // Calculate roll, pitch, and yaw angles for MPU-6050 #2
+  roll_2 = atan2(accY_2, accZ_2) * 180.0 / PI;
+  pitch_2 = atan2(accX_2 , sqrt(accY_2 * accY_2 + accZ_2 * accZ_2)) * 180.0 / PI;
+  yaw_2 = atan2(gyroY_2, gyroZ_2) * 180.0 / PI;
+  x1=abs(accY_2 * accY_2 + accZ_2 * accZ_2);
+  y2=constrain(x1,1,100000);
+  y3=atan2(-accX_2,sqrt(y2))*180.0/PI;
+
+  //Serial.println(x);
+  //Serial.println(y1);
+  //Serial.println(pitch_1);
+
+
+  // Print the results
+  Serial.print(roll_1);
+  Serial.print("/");
+  Serial.print(y1);
+  Serial.print("/");
+  Serial.print(yaw_1);
+  Serial.print("/");
+  Serial.print(roll_2);
+  Serial.print("/");
+  Serial.print(y3);
+  Serial.print("/");
+  Serial.println(yaw_2);
+
+  delay(100);
+}
+
+void readMPU6050Data(int addr, int16_t* accX, int16_t* accY, int16_t* accZ, int16_t* gyroX, int16_t* gyroY, int16_t* gyroZ) {
+  Wire.beginTransmission(addr);
+  Wire.write(ACCEL_XOUT_H_1);
+  Wire.endTransmission(false);
+  Wire.requestFrom(addr, 14, true);
+
+  *accX = Wire.read() << 8|Wire.read();
+  *accY = Wire.read() << 8|Wire.read();
+  *accZ = Wire.read() << 8|Wire.read();
+
+  Wire.read() << 8 | Wire.read();  // Skip temperature values
+
+  *gyroX = Wire.read() << 8|Wire.read();
+  *gyroY = Wire.read() << 8|Wire.read();
+  *gyroZ = Wire.read() << 8|Wire.read();
+}
