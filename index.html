@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IMU Data</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .heading-box {
+            background-color: #ff4d4d;
+            border-radius: 10px;
+            padding: 10px;
+            display: inline-block;
+        }
+
+        .heading-text {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* CSS styles for the graphs */
+        .graph-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .graph-container {
+            flex-basis: 30%;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 1000px;
+        }
+
+        .value-box {
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 15px;
+            font-family: "Digital", sans-serif;
+            font-weight: bold;
+            font-size: 18px;
+            color: #ffffff;
+            position: 50%;
+            left: 50%;
+            transform: translateX(150%);
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .roll-value-box {
+            background-color: red;
+        }
+
+        .pitch-value-box {
+            background-color: blue;
+        }
+
+        .yaw-value-box {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="heading-box">
+            <h1 class="heading-text">IMU Data</h1>
+        </div>
+    </div>
+
+    <div class="graph-row">
+        <div class="graph-container">
+            <canvas id="roll-chart-1"></canvas>
+            <div class="value-box roll-value-box">
+                Roll 1: <span id="roll-value-1"></span>&#xb0;
+            </div>
+            </p>
+            </p>
+            </p>
+            </p>
+            </p>
+            </p>
+            </p>
+            </p>
+
+        </div>
+
+        <div class="graph-container">
+            <canvas id="pitch-chart-1"></canvas>
+            <div class="value-box pitch-value-box">
+                Pitch 1: <span id="pitch-value-1"></span>&#xb0;
+            </div>
+        </div>
+        <div class="graph-container">
+            <canvas id="yaw-chart-1"></canvas>
+            <div class="value-box yaw-value-box">
+                Yaw 1: <span id="yaw-value-1"></span>&#xb0;
+            </div>
+        </div>
+    </div>
+
+    <div class="graph-row">
+        <div class="graph-container">
+            <canvas id="roll-chart-2"></canvas>
+            <div class="value-box roll-value-box">
+                Roll 2: <span id="roll-value-2"></span>&#xb0;
+
+            </div>
+        </div>
+
+        <div class="graph-container">
+            <canvas id="pitch-chart-2"></canvas>
+            <div class="value-box pitch-value-box">
+                Pitch 2: <span id="pitch-value-2"></span>&#xb0;
+            </div>
+        </div>
+        <div class="graph-container">
+            <canvas id="yaw-chart-2"></canvas>
+            <div class="value-box yaw-value-box">
+                Yaw 2: <span id="yaw-value-2"></span>&#xb0;
+            </div>
+        </div>
+    </div>
+
+    <script>$(document).ready(function () {
+            // Initialize roll chart for MPU #1
+            var rollChart1 = new Chart($('#roll-chart-1'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Roll 1',
+                            data: [],
+                            borderColor: 'red',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Roll 1'
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true
+                        }],
+                        yAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 18000
+                            }
+                        }]
+                    }
+                }
+            });
+
+            // Initialize pitch chart for MPU #1
+            var pitchChart1 = new Chart($('#pitch-chart-1'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Pitch 1',
+                            data: [],
+                            borderColor: 'blue',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Pitch 1'
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 18000
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 18000
+                            }
+                        }]
+                    }
+                }
+            });
+
+            // Initialize yaw chart for MPU #1
+            var yawChart1 = new Chart($('#yaw-chart-1'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Yaw 1',
+                            data: [],
+                            borderColor: 'green',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Yaw 1'
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 18000
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 180
+                            }
+                        }]
+                    }
+                }
+            });
+
+            // Initialize roll chart for MPU #2
+            var rollChart2 = new Chart($('#roll-chart-2'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Roll 2',
+                            data: [],
+                            borderColor: 'red',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Roll 2'
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 18000
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 180
+                            }
+                        }]
+                    }
+                }
+            });
+
+            // Initialize pitch chart for MPU #2
+            var pitchChart2 = new Chart($('#pitch-chart-2'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Pitch 2',
+                            data: [],
+                            borderColor: 'blue',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Pitch 2'
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 18000
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 180
+                            }
+                        }]
+                    }
+                }
+            });
+
+            // Initialize yaw chart for MPU #2
+            var yawChart2 = new Chart($('#yaw-chart-2'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Yaw 2',
+                            data: [],
+                            borderColor: 'green',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Yaw 2'
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 18000
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: -180,
+                                suggestedMax: 180
+                            }
+                        }]
+                    }
+                }
+            });
+
+            var maxDataPoints = 100; // Maximum number of data points to display
+
+            // Function to update the IMU data
+            function updateIMUData() {
+                $.ajax({
+                    url: '/imu/', // Replace with the correct endpoint to get IMU data
+                    type: "GET",
+                    success: function (response) {
+                        // Update roll chart for MPU #1
+                        rollChart1.data.labels.push(new Date().toLocaleTimeString());
+                        rollChart1.data.datasets[0].data.push(response.roll1);
+                        if (rollChart1.data.labels.length > maxDataPoints) {
+                            rollChart1.data.labels.shift();
+                            rollChart1.data.datasets[0].data.shift();
+                        }
+                        rollChart1.update();
+
+                        // Update pitch chart for MPU #1
+                        pitchChart1.data.labels.push(new Date().toLocaleTimeString());
+                        pitchChart1.data.datasets[0].data.push(response.pitch1);
+                        if (pitchChart1.data.labels.length > maxDataPoints) {
+                            pitchChart1.data.labels.shift();
+                            pitchChart1.data.datasets[0].data.shift();
+                        }
+                        pitchChart1.update();
+
+                        // Update yaw chart for MPU #1
+                        yawChart1.data.labels.push(new Date().toLocaleTimeString());
+                        yawChart1.data.datasets[0].data.push(response.yaw1);
+                        if (yawChart1.data.labels.length > maxDataPoints) {
+                            yawChart1.data.labels.shift();
+                            yawChart1.data.datasets[0].data.shift();
+                        }
+                        yawChart1.update();
+
+                        // Update roll chart for MPU #2
+                        rollChart2.data.labels.push(new Date().toLocaleTimeString());
+                        rollChart2.data.datasets[0].data.push(response.roll2);
+                        if (rollChart2.data.labels.length > maxDataPoints) {
+                            rollChart2.data.labels.shift();
+                            rollChart2.data.datasets[0].data.shift();
+                        }
+                        rollChart2.update();
+
+                        // Update pitch chart for MPU #2
+                        pitchChart2.data.labels.push(new Date().toLocaleTimeString());
+                        pitchChart2.data.datasets[0].data.push(response.pitch2);
+                        if (pitchChart2.data.labels.length > maxDataPoints) {
+                            pitchChart2.data.labels.shift();
+                            pitchChart2.data.datasets[0].data.shift();
+                        }
+                        pitchChart2.update();
+
+                        // Update yaw chart for MPU #2
+                        yawChart2.data.labels.push(new Date().toLocaleTimeString());
+                        yawChart2.data.datasets[0].data.push(response.yaw2);
+                        if (yawChart2.data.labels.length > maxDataPoints) {
+                            yawChart2.data.labels.shift();
+                            yawChart2.data.datasets[0].data.shift();
+                        }
+                        yawChart2.update();
+
+                        // Update current values
+                        $('#roll-value-1').text(response.roll1);
+                        $('#pitch-value-1').text(response.pitch1);
+                        $('#yaw-value-1').text(response.yaw1);
+                        $('#roll-value-2').text(response.roll2);
+                        $('#pitch-value-2').text(response.pitch2);
+                        $('#yaw-value-2').text(response.yaw2);
+                    },
+                    error: function (xhr, errmsg, err) {
+                        console.log(xhr.status + ':' + xhr.responseText);
+                    }
+                });
+            }
+
+            // Initial call to update IMU data
+            updateIMUData();
+
+            // Periodically update IMU data every 1 second (1000 milliseconds)
+            setInterval(updateIMUData, 10);
+
+        });</script>
+</body>
+</html>
