@@ -22,8 +22,8 @@ This file is responsible for the management of the Django project. It provides t
 - views.py:
 Contains the logic of the application. It processes the data transferred from the Arduino, structures it, and passes it to the appropriate templates for rendering. This file is responsible for taking motion sensor data and preparing it for display or further processing.
 
-urls.py:
-- Defines the URL routes of the Django application. It maps specific URLs to corresponding view functions in views.py, making sure that requests are routed to the correct part of the application.
+- urls.py:
+Defines the URL routes of the Django application. It maps specific URLs to corresponding view functions in views.py, making sure that requests are routed to the correct part of the application.
   
 - index.html:
 This is the front-end template where the processed data is visualized. It contains HTML and Django template language to render dynamic content like motion graphs or sensor readings based on the data passed from the backend.
